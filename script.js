@@ -54,9 +54,18 @@ function setReminder() {
     let time = parseInt(document.getElementById("reminder-time").value);
     if (!isNaN(time) && time > 0) {
         if (reminderInterval) clearInterval(reminderInterval);
+
+        // Show immediate notification to confirm it's set
+        new Notification("Reminder set! You'll get notified every " + time + " minutes between 8 AM - 10 PM.");
+
         reminderInterval = setInterval(() => {
-            new Notification("Time to drink water!");
+            let currentHour = new Date().getHours(); // Get current hour (0-23)
+
+            if (currentHour >= 8 && currentHour <= 23) { // Between 8 AM and 11 PM
+                new Notification("Time to drink water!");
+            }
         }, time * 60 * 1000);
+
         localStorage.setItem("reminderTime", time);
     }
 }
@@ -66,7 +75,9 @@ function enableNotifications() {
     if ("Notification" in window) {
         Notification.requestPermission().then((permission) => {
             if (permission === "granted") {
-                alert("Notifications enabled!");
+                alert("Notifications enabled! Now set a reminder.");
+            } else {
+                alert("Notifications are blocked. Enable them in browser settings.");
             }
         });
     } else {

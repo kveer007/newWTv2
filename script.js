@@ -146,19 +146,22 @@ function resetData() {
     }
 }
 
-// Reset Daily Intake Only
-function resetDailyIntake() {
-    let currentDate = new Date().toLocaleDateString();
+function checkAndResetDailyIntake() {
+    let now = new Date();
+    let currentDate = now.toLocaleDateString();
+    let currentHour = now.getHours();
+    let currentMinutes = now.getMinutes();
 
-    // Reset daily history for the current day
-    if (dailyHistory[currentDate]) {
-        delete dailyHistory[currentDate];
-        localStorage.setItem("dailyHistory", JSON.stringify(dailyHistory));
+    if ((currentHour > 4 || (currentHour === 4 && currentMinutes >= 18)) && lastResetDate !== currentDate) {
+        resetDailyIntake();
+        localStorage.setItem("lastResetDate", currentDate);
     }
+}
 
+function resetDailyIntake() {
     totalIntake = 0;
     updateDisplay();
-    showHistory(); // Refresh history
+    showHistory();
 }
 
 // Toggle Settings Visibility

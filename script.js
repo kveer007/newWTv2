@@ -101,7 +101,7 @@ function setReminder() {
         new Notification("Reminder set! You'll get notified every " + time + " minutes between 8 AM - 10 PM.");
 
         reminderInterval = setInterval(() => {
-            let currentHour = new Date().getHours(); // Get current hour (0-23)
+            let currentHour = new Date().getHours(); // 0-23
 
             if (currentHour >= 8 && currentHour <= 23) { // Between 8 AM and 11 PM
                 new Notification("Time to drink water!");
@@ -127,10 +127,18 @@ function enableNotifications() {
     }
 }
 
-// Reset All Data
+// Reset All Data (preserves older dailyHistory but resets current day's data)
 function resetData() {
     if (confirm("Are you sure you want to reset all data?")) {
-        localStorage.clear();
+        // Remove all non-history items from localStorage
+        localStorage.removeItem("waterIntake");
+        localStorage.removeItem("waterGoal");
+        localStorage.removeItem("reminderTime");
+        localStorage.removeItem("lastResetDate");
+        // You can remove 'previousIntake' too if you want:
+        // localStorage.removeItem("previousIntake");
+
+        // Reset variables and UI
         totalIntake = 0;
         goal = 0;
         document.getElementById("total").innerText = 0;
@@ -139,10 +147,12 @@ function resetData() {
         document.getElementById("reminder-time").value = "";
         document.getElementById("progress-bar").style.width = "0%";
 
+        // Clear any existing reminder interval
         if (reminderInterval) clearInterval(reminderInterval);
         reminderInterval = null;
         
-// Reset only today's history
+        // Reset only today's history
+        let currentDate = new Date().toLocaleDateString();
         if (dailyHistory[currentDate]) {
             dailyHistory[currentDate] = [];
             localStorage.setItem("dailyHistory", JSON.stringify(dailyHistory));
@@ -160,6 +170,7 @@ function checkAndResetDailyIntake() {
     
     let lastResetDate = localStorage.getItem("lastResetDate");
     
+    // Auto-reset at 1:00 AM if the app is open
     if (currentHour === 1 && currentMinutes === 0 && lastResetDate !== currentDate) {
         resetDailyIntake();
         localStorage.setItem("lastResetDate", currentDate);
@@ -193,6 +204,7 @@ function toggleSettings() {
     settings.style.display = settings.style.display === "none" ? "block" : "none";
 }
 
+// Close settings/history if user clicks outside
 document.addEventListener("click", function(event) {
     let settings = document.getElementById("settings-section");
     let history = document.getElementById("history-popup");
@@ -205,4 +217,3 @@ document.addEventListener("click", function(event) {
         history.style.display = "none";
     }
 });
-

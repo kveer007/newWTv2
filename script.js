@@ -141,7 +141,13 @@ function resetData() {
 
         if (reminderInterval) clearInterval(reminderInterval);
         reminderInterval = null;
-
+        
+// Reset only today's history
+        if (dailyHistory[currentDate]) {
+            dailyHistory[currentDate] = [];
+            localStorage.setItem("dailyHistory", JSON.stringify(dailyHistory));
+        }
+        
         alert("All data has been reset!");
     }
 }
@@ -151,18 +157,29 @@ function checkAndResetDailyIntake() {
     let currentDate = now.toLocaleDateString();
     let currentHour = now.getHours();
     let currentMinutes = now.getMinutes();
-
-    if ((currentHour > 4 || (currentHour === 4 && currentMinutes >= 18)) && lastResetDate !== currentDate) {
+    
+    let lastResetDate = localStorage.getItem("lastResetDate");
+    
+    if (currentHour === 2 && currentMinutes === 57 && lastResetDate !== currentDate) {
         resetDailyIntake();
         localStorage.setItem("lastResetDate", currentDate);
     }
 }
 
 function resetDailyIntake() {
+    let currentDate = new Date().toLocaleDateString();
+    
+    if (dailyHistory[currentDate]) {
+        dailyHistory[currentDate] = [];
+        localStorage.setItem("dailyHistory", JSON.stringify(dailyHistory));
+    }
+    
     totalIntake = 0;
     updateDisplay();
     showHistory();
 }
+
+setInterval(checkAndResetDailyIntake, 60000);
 
 // Toggle Settings Visibility
 function toggleSettings() {

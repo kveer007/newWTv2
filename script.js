@@ -160,7 +160,7 @@ function checkAndResetDailyIntake() {
     
     let lastResetDate = localStorage.getItem("lastResetDate");
     
-    if (currentHour === 2 && currentMinutes === 57 && lastResetDate !== currentDate) {
+    if (currentHour === 1 && currentMinutes === 0 && lastResetDate !== currentDate) {
         resetDailyIntake();
         localStorage.setItem("lastResetDate", currentDate);
     }
